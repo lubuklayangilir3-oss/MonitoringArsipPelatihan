@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoring Arsip Pelatihan</title>
+  
+  <!-- Memuat Tailwind CSS untuk styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8fafc;
+    }
+    
+    /* Custom Scrollbar untuk Modal Rekap */
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* Hide elements smoothly */
+    .fade-out { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .fade-in { opacity: 1; pointer-events: auto; transition: opacity 0.3s ease; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased p-4 md:p-8 max-w-7xl mx-auto">
+
+  <header class="text-center mb-10 mt-4">
+    <h1 class="text-3xl md:text-4xl font-bold text-blue-600 mb-3 tracking-tight">Peng-Arsipan Kegiatan Pelatihan</h1>
+    <p class="text-slate-500 text-sm md:text-base max-w-2xl mx-auto">Monitoring Jumlah Kegiatan pelatihan yang sudah diselenggarakan secara Real-Time.</p>
+  </header>
+
+  <!-- Banner Loading -->
+  <div id="loadingBanner" class="flex items-center justify-center gap-2 bg-blue-100 text-blue-800 p-4 rounded-xl mb-8 font-medium transition-all duration-500">
+    <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    <span id="loadingText">Sedang memuat data, Mohon Menunggu....</span>
+  </div>
+
+  <div id="formContainer" class="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm mb-10 transition-all duration-300">
+    <h2 id="formTitle" class="text-xl font-bold mb-6 text-slate-800 flex items-center gap-2">
+      <span>📄</span> Form Tambah Laporan Pelatihan
+    </h2>
+    
+    <form id="addArchiveForm">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <!-- Judul -->
+        <div class="flex flex-col gap-2">
+          <label for="inputJudul" class="text-sm font-semibold text-slate-700">Judul Pelatihan / Kegiatan</label>
+          <input type="text" id="inputJudul" class="px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" placeholder="Contoh: Sharing Knowledge" required>
+        </div>
+        
+        <!-- Kategori Tim -->
+        <div class="flex flex-col gap-2">
+          <label for="inputKategori" class="text-sm font-semibold text-slate-700">Tim Penyelenggara</label>
+          <select id="inputKategori" class="px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white transition-shadow" required>
+            <option value="" disabled selected>Pilih Tim</option>
+            <option value="Distribusi">Distribusi</option>
+            <option value="Neraca">Neraca</option>
+            <option value="Reformasi Birokrasi">Reformasi Birokrasi</option>
+            <option value="Produksi">Produksi</option>
+            <option value="IPDS">IPDS</option>
+            <option value="Diseminasi">Diseminasi</option>
+            <option value="Umum">Umum</option>
+            <option value="Sosial">Sosial</option>
+            <option value="Lainnya">Lainnya</option>
+          </select>
+        </div>
+
+        <!-- Tanggal Mulai -->
+        <div class="flex flex-col gap-2">
+          <label for="inputTanggalMulai" class="text-sm font-semibold text-slate-700">Tanggal Mulai</label>
+          <input type="date" id="inputTanggalMulai" class="px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" required>
+        </div>
+
+        <!-- Tanggal Selesai -->
+        <div class="flex flex-col gap-2">
+          <label for="inputTanggalSelesai" class="text-sm font-semibold text-slate-700">Tanggal Selesai</label>
+          <input type="date" id="inputTanggalSelesai" class="px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" required>
+        </div>
+
+        <!-- Manajer -->
+        <div class="flex flex-col gap-2">
+          <label for="inputManajer" class="text-sm font-semibold text-slate-700">Nama Manajer Kelas/LP</label>
+          <input type="text" id="inputManajer" class="px-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-shadow" placeholder="Nama lengkap manajer" required>
+
+        </div>
+
+        <!-- File Upload -->
+        <div class="flex flex-col gap-2">
+          <label for="inputFile" class="text-sm font-semibold text-slate-700">Upload Laporan </label>
+          <input type="file" id="inputFile" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-all cursor-pointer" required>
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="flex gap-3 mt-4">
+        <button type="submit" id="btnSubmit" class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm flex justify-center items-center gap-2">
+          <span>➕</span> Simpan Laporan
+        </button>
+        <button type="button" id="btnCancelEdit" onclick="cancelEdit()" class="hidden md:flex-none bg-slate-500 hover:bg-slate-600 text-white font-semibold py-2.5 px-6 rounded-lg transition-colors shadow-sm">
+          Batal Edit
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="flex flex-col md:flex-row gap-4 mb-8 justify-between items-center">
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <div class="relative w-full sm:w-64">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">🔍</span>
+        <input type="text" id="searchInput" class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm" placeholder="Cari judul atau manajer...">
+      </div>
+      <select id="categoryFilter" class="w-full sm:w-48 px-4 py-2.5 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm bg-white">
+        <option value="all">Semua Tim (Kategori)</option>
+        <option value="Distribusi">Distribusi</option>
+        <option value="Neraca">Neraca</option>
+        <option value="Reformasi Birokrasi">Reformasi Birokrasi</option>
+        <option value="Produksi">Produksi</option>
+        <option value="IPDS">IPDS</option>
+        <option value="Diseminasi">Diseminasi</option>
+        <option value="Umum">Umum</option>
+        <option value="Sosial">Sosial</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+      <button onclick="refreshData()" class="w-full sm:w-auto bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+        🔄 Refresh
+      </button>
+      <button onclick="openRecapModal()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-6 rounded-xl transition-colors shadow-sm flex items-center justify-center gap-2">
+        📊 Rekap Pelatihan
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-6 flex items-center justify-between bg-blue-50 border border-blue-100 p-4 rounded-xl transition-all duration-300">
+    <div class="text-sm text-blue-800 font-medium flex items-center gap-2">
+      <span class="text-xl">📁</span>
+      <span>Total Laporan Ditampilkan:</span>
+    </div>
+    <span id="totalArsipCount" class="bg-blue-600 text-white font-bold px-4 py-1.5 rounded-lg text-lg shadow-sm">0</span>
+  </div>
+
+  <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="archiveGrid">
+    <!-- Konten akan dirender menggunakan JavaScript -->
+  </main>
+  
+  <!-- Container untuk Pagination -->
+  <div id="paginationControls" class="flex justify-center items-center gap-2 mt-8 flex-wrap"></div>
+  
+  <div class="hidden text-center py-12 text-slate-500 bg-white border border-dashed border-slate-300 rounded-2xl mt-4" id="emptyMessage">
+    <span class="text-4xl block mb-3">📭</span>
+    <p>Arsip pelatihan tidak ditemukan atau belum ada data.</p>
+  </div>
+
+  <footer class="text-center mt-16 mb-8 text-slate-500 text-sm">
+    &copy; 2026 Arsip Monitoring Pelatihan. Layanan Terdigitalisasi @SDM 1700 .
+  </footer>
+
+  <!-- Toast Container untuk menggantikan alert() -->
+  <div id="toastContainer" class="fixed top-5 right-5 z-[60] flex flex-col gap-3 pointer-events-none"></div>
+
+  <!-- Modal Konfirmasi Hapus -->
+  <div id="deleteModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white w-[90%] max-w-md p-6 rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300" id="deleteModalContent">
+      <h3 class="text-xl font-bold text-slate-800 mb-2">Konfirmasi Hapus</h3>
+      <p class="text-slate-600 mb-6">Apakah Anda yakin ingin menghapus arsip <strong id="deleteTargetName" class="text-slate-800"></strong>? Tindakan ini akan menghapusnya dari Database SDM</p>
+      
+      <div class="flex justify-end gap-3">
+        <button onclick="closeModal('deleteModal')" class="px-5 py-2 rounded-lg font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">Batal</button>
+        <button onclick="executeDelete()" class="px-5 py-2 rounded-lg font-medium text-white bg-red-600 hover:bg-red-700 transition-colors">Ya, Hapus</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rekap -->
+  <div id="recapModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden items-center justify-center opacity-0 transition-opacity duration-300">
+    <div class="bg-white w-[90%] max-w-2xl max-h-[80vh] flex flex-col rounded-2xl shadow-2xl transform scale-95 transition-transform duration-300" id="recapModalContent">
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+        <h3 class="text-xl font-bold text-slate-800">Rekap Laporan Per Tahun</h3>
+        <button onclick="closeModal('recapModal')" class="text-slate-400 hover:text-slate-700 text-2xl leading-none">&times;</button>
+      </div>
+      
+      <div class="p-6 overflow-y-auto custom-scrollbar flex-1" id="recapBody">
+        <!-- Tabel rekap di-render dari JS -->
+      </div>
+      
+      <div class="p-4 border-t border-slate-100 flex justify-end">
+        <button onclick="closeModal('recapModal')" class="px-6 py-2 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Konfigurasi URL Google Apps Script
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzouj0Ffulx1YkUOarJC5MXdEAXcmyst2FBr8b7-8V2kieL6tZPGziAe4UJE5AnTbjT6A/exec';
+
+    // State Variables
+    let archivesData = [];
+    let currentFilteredData = []; // Data aktif setelah filter
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    let isEditing = false;
+    let editingId = null;
+    let deleteId = null;
+
+    // DOM Elements
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const archiveGrid = document.getElementById('archiveGrid');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const loadingBanner = document.getElementById('loadingBanner');
+    const addArchiveForm = document.getElementById('addArchiveForm');
+
+
+    // Custom Toast Notification System
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const baseClasses = 'px-5 py-3 rounded-xl shadow-lg text-sm font-semibold text-white flex items-center gap-3 transform translate-x-10 opacity-0 transition-all duration-300';
+      const colorClasses = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+      const icon = type === 'success' ? '✅' : type === 'error' ? '⚠️' : 'ℹ️';
+
+      toast.className = `${baseClasses} ${colorClasses}`;
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      
+      container.appendChild(toast);
+
+      // Animate In
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-x-10', 'opacity-0');
+      });
+
+      // Animate Out & Remove
+      setTimeout(() => {
+        toast.classList.add('translate-x-10', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    async function fetchArchives() {
+      try {
+        const response = await fetch(SCRIPT_URL);
+        if(!response.ok) throw new Error("Network Response error");
+        
+        archivesData = await response.json();
+        hideLoading();
+
+        // Inisialisasi Pagination
+        currentFilteredData = [...archivesData];
+        renderPage(1);
+      } catch (error) {
+        // Fallback jika API gagal dimuat (CORS atau URL tidak valid)
+        const bannerText = document.getElementById('loadingText');
+        const spinner = loadingBanner.querySelector('svg');
+        
+        loadingBanner.classList.replace('bg-blue-100', 'bg-amber-100');
+        loadingBanner.classList.replace('text-blue-800', 'text-amber-800');
+        spinner.classList.add('hidden');
+        
+        bannerText.innerHTML = "⚠️ <strong> Gagal Dimuat.</strong> Menampilkan data simulasi (Dummy Data) untuk demonstrasi UI.";
+        
+        archivesData = dummyData;
+        currentFilteredData = [...archivesData];
+        renderPage(1);
+        
+        setTimeout(() => hideLoading(), 3000); // Sembunyikan setelah 3 detik
+      }
+    }
+
+    async function refreshData() {
+      // Tampilkan kembali loading banner
+      loadingBanner.style.display = 'flex';
+      loadingBanner.classList.remove('fade-out');
+      
+      // Kembalikan warna biru jika sebelumnya error (kuning/amber)
+      loadingBanner.classList.remove('bg-amber-100', 'text-amber-800');
+      loadingBanner.classList.add('bg-blue-100', 'text-blue-800');
+      
+      const spinner = loadingBanner.querySelector('svg');
+      if(spinner) spinner.classList.remove('hidden');
+      
+      document.getElementById('loadingText').innerHTML = "Menyegarkan data dari Database...";
+
+      // Ambil ulang data
+      await fetchArchives();
+      
+      // Terapkan kembali filter yang sedang diketik/dipilih user
+      filterArchives();
+      
+      showToast("Data berhasil diperbarui!", "info");
+    }
+
+    function hideLoading() {
+      loadingBanner.classList.add('fade-out');
+      setTimeout(() => loadingBanner.style.display = 'none', 300);
+    }
+
+    function renderPage(page) {
+      currentPage = page;
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const pageData = currentFilteredData.slice(startIndex, endIndex);
+
+      // Update badge informasi jumlah laporan yang tertampil vs total laporan
+      const totalCountElement = document.getElementById('totalArsipCount');
+      if (totalCountElement) {
+        if (currentFilteredData.length === 0) {
+          totalCountElement.textContent = "0";
+        } else {
+          totalCountElement.textContent = `${startIndex + 1}-${Math.min(endIndex, currentFilteredData.length)} dari total ${currentFilteredData.length}`;
+        }
+      }
+
+      renderCards(pageData);
+      renderPaginationControls();
+    }
+
+    function renderPaginationControls() {
+      const container = document.getElementById('paginationControls');
+      container.innerHTML = '';
+      const totalPages = Math.ceil(currentFilteredData.length / itemsPerPage);
+
+      // Sembunyikan pagination jika jumlah halaman hanya 1 atau kosong
+      if (totalPages <= 1) return; 
+
+      // Tombol Prev
+      const prevBtn = document.createElement('button');
+      prevBtn.innerHTML = '← Prev';
+      prevBtn.className = `px-4 py-2 rounded-lg font-medium text-sm transition-colors ${currentPage === 1 ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm'}`;
+      prevBtn.disabled = currentPage === 1;
+      prevBtn.onclick = () => renderPage(currentPage - 1);
+      container.appendChild(prevBtn);
+
+      // Angka Halaman
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.innerText = i;
+        if (i === currentPage) {
+          btn.className = 'px-4 py-2 w-10 rounded-lg font-medium text-sm bg-blue-600 text-white shadow-sm';
+        } else {
+          btn.className = 'px-4 py-2 w-10 rounded-lg font-medium text-sm bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors shadow-sm';
+          btn.onclick = () => renderPage(i);
+        }
+        container.appendChild(btn);
+      }
+
+      // Tombol Next
+      const nextBtn = document.createElement('button');
+      nextBtn.innerHTML = 'Next →';
+      nextBtn.className = `px-4 py-2 rounded-lg font-medium text-sm transition-colors ${currentPage === totalPages ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 shadow-sm'}`;
+      nextBtn.disabled = currentPage === totalPages;
+      nextBtn.onclick = () => renderPage(currentPage + 1);
+      container.appendChild(nextBtn);
+    }
+
+    function renderCards(data) {
+      archiveGrid.innerHTML = '';
+
+      if (data.length === 0) {
+        emptyMessage.classList.remove('hidden');
+        return;
+      }
+      emptyMessage.classList.add('hidden');
+
+      data.forEach(item => {
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        const tglMulaiF = new Date(item.tanggal_mulai).toLocaleDateString('id-ID', options);
+        let rentang = tglMulaiF;
+        
+        if (item.tanggal_selesai && item.tanggal_mulai !== item.tanggal_selesai) {
+          const tglSelesaiF = new Date(item.tanggal_selesai).toLocaleDateString('id-ID', options);
+          rentang = `${tglMulaiF} - ${tglSelesaiF}`;
+        }
+
+        // Tentukan warna badge berdasarkan kategori
+        let badgeColor = 'bg-slate-100 text-slate-700';
+        if(item.kategori === 'IPDS') badgeColor = 'bg-purple-100 text-purple-700';
+        else if(item.kategori === 'Umum') badgeColor = 'bg-blue-100 text-blue-700';
+        else if(item.kategori === 'Sosial') badgeColor = 'bg-pink-100 text-pink-700';
+        else if(item.kategori === 'Distribusi') badgeColor = 'bg-orange-100 text-orange-700';
+        else badgeColor = 'bg-emerald-100 text-emerald-700';
+
+        const card = document.createElement('article');
+        card.className = 'bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col justify-between';
+        
+        card.innerHTML = `
+          <div>
+            <div class="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 ${badgeColor}">
+              ${item.kategori}
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2 leading-tight">${item.judul}</h3>
+            
+            <div class="space-y-2 mt-4 text-sm text-slate-600 flex-1">
+              <p class="flex items-start gap-2">
+                <span class="text-lg leading-none">📅</span>
+                <span>${rentang}</span>
+              </p>
+              <p class="flex items-start gap-2">
+                <span class="text-lg leading-none">👤</span>
+                <span>${item.manajer}</span>
+              </p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 mt-6 pt-5 border-t border-slate-100">
+            <a href="${item.file_url || '#'}" target="_blank" class="text-center py-2 px-3 rounded-lg text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors">
+              👁️ Buka File
+            </a>
+            <button onclick="startEdit('${item.id}')" class="text-center py-2 px-3 rounded-lg text-sm font-medium text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors">
+              ✏️ Edit
+            </button>
+            <button onclick="promptDelete('${item.id}', '${item.judul.replace(/'/g, "\\'")}')" class="col-span-2 text-center py-2 px-3 rounded-lg text-sm font-medium text-red-600 bg-white border border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors">
+              🗑️ Hapus Arsip
+            </button>
+          </div>
+        `;
+        archiveGrid.appendChild(card);
+      });
+    }
+
+    function filterArchives() {
+      const q = searchInput.value.toLowerCase();
+      const cat = categoryFilter.value;
+
+      currentFilteredData = archivesData.filter(item => {
+        const matchQ = item.judul.toLowerCase().includes(q) || item.manajer.toLowerCase().includes(q);
+        const matchCat = cat === 'all' || item.kategori === cat;
+        return matchQ && matchCat;
+      });
+      
+      // Kembali ke halaman 1 setiap kali mencari/filter diubah
+      renderPage(1);
+    }
+
+    searchInput.addEventListener('input', filterArchives);
+    categoryFilter.addEventListener('change', filterArchives);
+
+    // Fungsi helper untuk mengkonversi file upload menjadi teks Base64 agar mudah dikirim
+    function getBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+      });
+    }
+
+    addArchiveForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('btnSubmit');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '⏳ Mengunggah Data Arsip ke Penyimpanan...';
+      submitBtn.disabled = true;
+
+      const fileInput = document.getElementById('inputFile');
+      let fileBase64 = "";
+      let fileName = "";
+      let mimeType = "";
+      
+      // Jika ada file yang diupload, proses pembacaan file
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        fileName = file.name;
+        mimeType = file.type;
+        try {
+          fileBase64 = await getBase64(file);
+        } catch(e) {
+          showToast("Gagal memproses file dokumen.", "error");
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+          return;
+        }
+      }
+
+      // Pertahankan URL file lama jika sedang edit tapi tidak ada file baru yang diupload
+      let currentFileUrl = "";
+      if (isEditing) {
+        const currentItem = archivesData.find(x => x.id === editingId);
+        if (currentItem) currentFileUrl = currentItem.file_url;
+      }
+
+      const payload = {
+        action: isEditing ? "update" : "add",
+        id: isEditing ? editingId : 'ID-' + Date.now(),
+        judul: document.getElementById('inputJudul').value,
+        kategori: document.getElementById('inputKategori').value,
+        tanggal_mulai: document.getElementById('inputTanggalMulai').value,
+        tanggal_selesai: document.getElementById('inputTanggalSelesai').value,
+        manajer: document.getElementById('inputManajer').value,
+        file_url: currentFileUrl, 
+        fileName: fileName,
+        mimeType: mimeType,
+        fileBase64: fileBase64
+      };
+
+      try {
+        // Kirim HTTP Post ke Spreadsheet. Tidak memakai header Content-Type application/json 
+        // untuk menghindari masalah CORS Preflight bawaan Google Script.
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+
+        if (result.status === 'success') {
+          showToast(isEditing ? "Data & File berhasil diperbarui!" : "Laporan sukses terupload Penyimpanan SDM", "success");
+          cancelEdit();
+          
+          // Ambil kembali data *Real* yang sudah terhubung dengan link Google Drive
+          refreshData(); 
+        } else {
+          showToast("Terjadi kesalahan di server, Silahkan Refresh Halaman.", "error");
+        }
+
+      } catch (err) {
+        showToast("Terjadi kesalahan sistem / jaringan.", "error");
+      } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    function startEdit(id) {
+      const item = archivesData.find(d => d.id == id);
+      if (!item) return;
+
+      isEditing = true;
+      editingId = id;
+
+      document.getElementById('inputJudul').value = item.judul;
+      document.getElementById('inputKategori').value = item.kategori;
+      document.getElementById('inputTanggalMulai').value = item.tanggal_mulai;
+      document.getElementById('inputTanggalSelesai').value = item.tanggal_selesai;
+      document.getElementById('inputManajer').value = item.manajer;
+      document.getElementById('inputFile').required = false;
+
+      // Ubah Tampilan Form
+      const container = document.getElementById('formContainer');
+      container.classList.add('border-amber-400', 'ring-4', 'ring-amber-400/20');
+      
+      document.getElementById('formTitle').innerHTML = '✏️ Edit Laporan Pelatihan';
+      
+      const btnSubmit = document.getElementById('btnSubmit');
+      btnSubmit.innerHTML = '💾 Update ke Penyimpanan';
+      btnSubmit.classList.replace('bg-green-600', 'bg-amber-600');
+      btnSubmit.classList.replace('hover:bg-green-700', 'hover:bg-amber-700');
+      
+      document.getElementById('btnCancelEdit').classList.remove('hidden');
+      
+      container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEdit() {
+      isEditing = false;
+      editingId = null;
+      addArchiveForm.reset();
+      
+      // Kembalikan tampilan Form
+      const container = document.getElementById('formContainer');
+      container.classList.remove('border-amber-400', 'ring-4', 'ring-amber-400/20');
+      
+      document.getElementById('formTitle').innerHTML = '<span>📄</span> Form Tambah Laporan Pelatihan';
+      
+      const btnSubmit = document.getElementById('btnSubmit');
+      btnSubmit.innerHTML = '<span>➕</span> Simpan Laporan';
+      btnSubmit.classList.replace('bg-amber-600', 'bg-green-600');
+      btnSubmit.classList.replace('hover:bg-amber-700', 'hover:bg-green-700');
+      
+      document.getElementById('btnCancelEdit').classList.add('hidden');
+      document.getElementById('inputFile').required = true;
+    }
+
+    function promptDelete(id, title) {
+      deleteId = id;
+      document.getElementById('deleteTargetName').textContent = title;
+      openModal('deleteModal');
+    }
+
+    async function executeDelete() {
+      closeModal('deleteModal');
+      
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: "delete", id: deleteId })
+        });
+        
+        const result = await response.json();
+        
+        if(result.status === 'success') {
+          showToast("Arsip berhasil dihapus secara permanen dari Database!", "success");
+          // Perbarui data dengan fetch ulang dari API
+          refreshData();
+        } else {
+           showToast("Gagal menghapus arsip di server.", "error");
+        }
+      } catch(err) {
+        showToast("Gagal menghubungi server, Silahkan Refresh Halaman.", "error");
+      }
+    }
+
+    function openRecapModal() {
+      const yearTally = {};
+      archivesData.forEach(item => {
+        if (item.tanggal_mulai) {
+          const year = item.tanggal_mulai.split('-')[0];
+          yearTally[year] = (yearTally[year] || 0) + 1;
+        }
+      });
+
+      let html = `
+        <div class="overflow-hidden rounded-xl border border-slate-200">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="px-6 py-4">Tahun Pelaksanaan</th>
+                <th class="px-6 py-4">Jumlah Pelatihan</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+      `;
+      
+      const sortedYears = Object.entries(yearTally).sort().reverse();
+      
+      if(sortedYears.length === 0) {
+          html += `<tr><td colspan="2" class="px-6 py-8 text-center text-slate-500">Belum ada data rekap</td></tr>`;
+      } else {
+          for (const [yr, count] of sortedYears) {
+            html += `
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4 font-medium text-slate-800">${yr}</td>
+                <td class="px-6 py-4 text-slate-600">
+                  <span class="bg-blue-100 text-blue-700 py-1 px-3 rounded-full text-xs font-bold">${count} Laporan</span>
+                </td>
+              </tr>
+            `;
+          }
+      }
+      
+      html += `</tbody></table></div>`;
+      
+      document.getElementById('recapBody').innerHTML = html;
+      openModal('recapModal');
+    }
+
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      const content = modal.querySelector('div');
+      
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      
+      // Delay sedikit untuk memicu transisi opacity & scale
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+      }, 10);
+    }
+
+    function closeModal(id) { 
+      const modal = document.getElementById(id);
+      const content = modal.querySelector('div');
+      
+      modal.classList.add('opacity-0');
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      
+      // Tunggu animasi selesai baru di hidden
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }, 300);
+    }
+
+    // Initialize fetching data saat halaman load
+    window.addEventListener('DOMContentLoaded', fetchArchives);
+
+  </script>
+</body>
+</html>
